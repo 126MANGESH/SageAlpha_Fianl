@@ -1,26 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello Flask</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        h1 {
-            font-size: 3rem;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SageAlpha.ai Chat</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chat-box {
+      background: white;
+      color: #333;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 15px;
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background: #f7f7f7;
+    }
+    .msg {
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+    .user {
+      background: #667eea;
+      color: white;
+      align-self: flex-end;
+    }
+    .assistant {
+      background: #e0e0e0;
+      align-self: flex-start;
+    }
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+    button {
+      width: 80px;
+      border: none;
+      background: #667eea;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #556cd6; }
+  </style>
 </head>
 <body>
-    <h1>Hello, World! 👋</h1>
+  <div class="chat-box">
+    <div class="header">💬 SageAlpha.ai</div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input type="text" id="messageInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const messagesDiv = document.getElementById("messages");
+    const input = document.getElementById("messageInput");
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage("user", text);
+      input.value = "";
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      if (data.response) addMessage("assistant", data.response);
+      else addMessage("assistant", "⚠️ Error: " + data.error);
+    }
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = `msg ${role}`;
+      div.textContent = text;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
 </body>
 </html>
