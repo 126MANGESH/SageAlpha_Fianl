@@ -9,3 +9,5 @@ sentence-transformers==3.1.1  # For embeddings
 faiss-cpu==1.8.0  # For vector search (lightweight)
 numpy==1.26.4  # Dependency for FAISS
 azure-storage-blob==12.17.0  # For Azure Blob Storage integration
+python-dotenv ==1.0.1  # For environment variable management
+six==1.16.0
