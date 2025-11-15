@@ -1,6 +1,4 @@
-# Build and deploy Python app to Azure Web App - SageAlphaPlan
-
-name: Build and deploy Python app to Azure Web App - SageAlphaPlan
+name: Deploy SageAlphaPlan
 
 on:
   push:
@@ -9,49 +7,35 @@ on:
   workflow_dispatch:
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
-      # ---------------------------
-      # 1. Checkout repo
-      # ---------------------------
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # ---------------------------
-      # 2. Set up Python
-      # ---------------------------
-      - name: Set up Python version
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # ---------------------------
-      # 3. Local build validation
-      # ---------------------------
-      - name: Create venv & install requirements
+      - name: Install dependencies (optional)
         run: |
           python -m venv antenv
           source antenv/bin/activate
-          pip install -r SAGEALPHA/requirements.txt
+          pip install -r requirements.txt
 
-      # ---------------------------
-      # 4. Upload only app contents (NOT the SAGEALPHA folder)
-      # ---------------------------
-      - name: Upload artifact for deployment
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
-            SAGEALPHA/app.py
-            SAGEALPHA/requirements.txt
-            SAGEALPHA/templates/**
-            SAGEALPHA/flask-quickstart/**
-            SAGEALPHA/.env
-            !SAGEALPHA/env/
+            app.py
+            requirements.txt
+            templates/**
+            static/**
+            .env
+            !antenv/
             !.git/
             !.github/
 
@@ -60,22 +44,14 @@ jobs:
     needs: build
 
     steps:
-
-      # ---------------------------
-      # 1. Download build artifact
-      # ---------------------------
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      # ---------------------------
-      # 2. Deploy to Azure App Service
-      # ---------------------------
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'SageAlphaPlan'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_328E1B4DBACF466EA0F34313A7A5433F }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
