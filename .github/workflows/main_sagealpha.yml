@@ -60,4 +60,3 @@ jobs:
           app-name: 'sagealpha'
           slot-name: 'Production'
           images: 'sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_46F57B92576A4A91B8B257811313B118 }}/sagealpha-web-app:${{ github.sha }}'
-          
