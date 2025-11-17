@@ -12,4 +12,5 @@ six==1.16.0
 Werkzeug==3.0.1
 setuptools>=60.0.0
 wheel>=0.37.0
+WEBSITES_PORT=8000
 waitress
