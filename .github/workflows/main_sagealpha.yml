@@ -14,10 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
-    
-    # 🌟 CRITICAL FIX: Add this environment block to stop the hidden Python build
-    env:
-      SCM_DO_BUILD_DURING_DEPLOYMENT: false 
 
     steps:
       - uses: actions/checkout@v4
@@ -29,15 +25,15 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: sagealphacontainer.azurecr.io/
-          username: ${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_46F57B92576A4A91B8B257811313B118 }}
-          password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_AB3E45EE91B74751BA957B7CDAEC4799 }}
+          username: ${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_6DCEEC25B73B46608C16AF3497B4B9FC }}
+          password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_17F456665BC34FC7B6AC7099F630D012 }}
 
       - name: Build and push container image to registry
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
-          tags: sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_46F57B92576A4A91B8B257811313B118 }}/sagealpha-web-app:${{ github.sha }}
+          tags: sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_6DCEEC25B73B46608C16AF3497B4B9FC }}/sagealphacontainer/sagealpha-web-app:${{ github.sha }}
           file: ./Dockerfile
 
   deploy:
@@ -53,9 +49,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_63D2422747314BA4BD85A3426CFC3A2B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4224043BD5C74DFABF9BB5B34838CB28 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_AF2C27C6C8AE40EC93B2A2CEF1E3035E }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5DED3A75B67B44CCA6055AEF1C846CD5 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9A5BB030D24448AE83F5AF737AB311FE }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3A615E2D45004D65A6241527D192404B }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -63,4 +59,5 @@ jobs:
         with:
           app-name: 'sagealpha'
           slot-name: 'Production'
-          images: 'sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_46F57B92576A4A91B8B257811313B118 }}/sagealpha-web-app:${{ github.sha }}'
+          images: 'sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_6DCEEC25B73B46608C16AF3497B4B9FC }}/sagealphacontainer/sagealpha-web-app:${{ github.sha }}'
+          
