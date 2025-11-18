@@ -1,0 +1,63 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - sagealpha
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: sagealphacontainer.azurecr.io/
+          username: ${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_181E7EB4678243779BE7022135F44045 }}
+          password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_4A35E8A0F8A44EAE837B4A7FB78EFA68 }}
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_181E7EB4678243779BE7022135F44045 }}/sagealphacontainer/sagealphacontainer/sagealpha-web-app:${{ github.sha }}
+          file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    needs: build
+    
+    steps:
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_620B7BA3D99B4F05BD35EC69FC4AF9EC }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EA2C2A8456C749BB8EC493BE9B4BD1FD }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_810C3F5FCA604A5C95C68731A76EC0CC }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'sagealpha'
+          slot-name: 'Production'
+          images: 'sagealphacontainer.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_181E7EB4678243779BE7022135F44045 }}/sagealphacontainer/sagealphacontainer/sagealpha-web-app:${{ github.sha }}'
+          
