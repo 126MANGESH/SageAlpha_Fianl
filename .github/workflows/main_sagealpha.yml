@@ -32,7 +32,11 @@ jobs:
           app-name: 'sagealpha'
           slot-name: 'Production'
           package: .
-          # Added for explicit ZIP deployment to avoid common extraction issues
-          deployment-method: zipDeploy
-          # Added for verbose logging to help debug any future errors
-          enable_verbosity_logging: true
+
+      - name: Check Deployment Logs (Debug)
+        if: always()
+        run: |
+          az webapp log tail \
+            --name sagealpha \
+            --resource-group <your-resource-group-name> \  # Replace with actual RG, e.g., rg-sagealpha
+            --slot Production
