@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "targets": {
+    "sagealpha-appsail": {
+      "type": "appsail",
+      "runtime": "python39",
+      "path": "./"
+    }
+  },
+  "appsail": [
+    {
+      "source": ".",
+      "name": "sagealpha"
+    }
+  ]
+}
