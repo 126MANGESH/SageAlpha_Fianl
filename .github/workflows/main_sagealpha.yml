@@ -1,25 +1,30 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 name: Build and deploy to Azure Web App - sagealpha
+
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_620B7BA3D99B4F05BD35EC69FC4AF9EC }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EA2C2A8456C749BB8EC493BE9B4BD1FD }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_810C3F5FCA604A5C95C68731A76EC0CC }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -27,3 +32,7 @@ jobs:
           app-name: 'sagealpha'
           slot-name: 'Production'
           package: .
+          # Added for explicit ZIP deployment to avoid common extraction issues
+          deployment-method: zipDeploy
+          # Added for verbose logging to help debug any future errors
+          enable_verbosity_logging: true
